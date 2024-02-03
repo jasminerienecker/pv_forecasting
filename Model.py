@@ -58,7 +58,7 @@ def create_dataset(pv_data: pd.DataFrame, weather_data: pd.DataFrame):
 
         #check that the date is in the pv_dataframe (start of weather recordings is 6 months earlier than the start
         #of the pv recordings)
-        if len(pv_index_final_weather) == 0:
+        if len(pv_index_final_weather_date) == 0:
             continue
 
         pv_start_index = pv_index_final_weather_date[0] + 1
@@ -102,7 +102,7 @@ def create_model():
     concatenated = layers.Concatenate()([lstm_pv, lstm_weather])
     output = layers.Dense(units=10080, activation='relu')(concatenated)
 
-    return keras.Model(inputs=[input_pv, input_weather], outputs=output)
+    return keras.Model(inputs=[input_weather, input_pv], outputs=output)
 
 def train_test_split(X_weather: np.array, X_pv: np.array, y: np.array, train_samples: int, test_samples: int):
     test_index = -1 * test_samples
@@ -125,7 +125,7 @@ def fit_model(model, X_train, y_train):
 
 
 def predict(model, X_test, y_test, scaler_pv):
-    yhat = model2.predict(X_test)
+    yhat = model.predict(X_test)
     inv_yhat = scaler_pv.inverse_transform(yhat)
     inv_ytest = scaler_pv.inverse_transform(y_test)
 
